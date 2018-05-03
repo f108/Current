@@ -19,7 +19,7 @@ namespace HolaDownloader
     public partial class HolaDownloader : Form
     {
         static int MaxDownloadThreads = 30;
-        static int filesCounter = 0;
+        static int filesCounter = 1;
         
         class taskItem
         {
