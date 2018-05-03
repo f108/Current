@@ -46,7 +46,6 @@ namespace ExternalMouse
 
         private ArrayList _pairedHost = new ArrayList();
         private int LocalDesktopIndex = 0;
-        //public isLocalDesc
 
         public string GetLocalHostInfo()
         {
