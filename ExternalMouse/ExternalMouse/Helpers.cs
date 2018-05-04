@@ -37,11 +37,7 @@ namespace ExternalMouse
             {
                 using (Graphics g = Graphics.FromImage(bmpScreen))
                 {
-                    g.CopyFromScreen(screen.Bounds.X,
-                                     screen.Bounds.Y,
-                                     0, 0,
-                                     bmpScreen.Size,
-                                     CopyPixelOperation.SourceCopy);
+                    g.CopyFromScreen(screen.Bounds.X, screen.Bounds.Y, 0, 0, bmpScreen.Size, CopyPixelOperation.SourceCopy);
                 };
 
                 using (Graphics g = Graphics.FromImage(ret))
