@@ -1,0 +1,167 @@
+﻿
+.mcdiv {
+    width: 100%;
+    height: 100%;
+}
+
+.mcheader {
+    height:15%;
+    display: block;
+    font-size: 3vw;
+}
+
+.mccurname, .mcdirection_animated {
+    font-size:5vw;
+}
+
+.mchleft {
+    width:40%;
+    display:inline-block;
+}
+
+.mchright {
+    display:inline;
+}
+
+.mccentral {
+    height:50%;
+    display: block;
+    text-align: center;
+    vertical-align:middle;
+}
+
+.mcvalue {
+    display:inline;
+    font-size: 13vw;
+}
+
+.mcvalue3 {
+    display:inline;
+    font-size: 6vw;
+}
+
+.mcfooter {
+    height:35%;
+    display: block;
+    font-size:1vw;
+}
+
+.mcftop {
+    width:100%;
+    height:50%;
+    display:block;
+}
+
+.mcfcaption {
+    float:left;
+    width:5%;
+    height:100%;
+    display:inline;
+}
+
+.mcfcontent {
+    float:right;
+    width:95%;
+    height:100%;
+    display:inline;
+}
+
+.mcfcrow1, .mcfcrow2, .mcfcrow3 {
+    width:100%;
+    height:50%;
+    display:block;
+}
+
+.rowvalue {
+    display:inline;
+    font-size:2.5vw;
+}
+
+        .header {
+            height: 20%;
+            display: block;
+            position: relative;
+            float: left;
+            left: 10.00%;
+            width: 80.00%;
+            background-color: transparent;
+        }
+
+        .wrapper {
+            height: 60%;
+            display: block;
+            position: relative;
+            float: left;
+            left: 10.00%;
+            width: 80.00%;
+            background-color: transparent;
+        }
+
+        .left {
+            position: relative;
+            height: 100%;
+            float: left;
+            left: 0.00%;
+            width: 50.00%;
+            background-color: rgba(227, 255, 216, 0.09);
+            -moz-border-radius: 15px;
+            border-radius: 15px;
+        }
+
+        .right {
+            position: relative;
+            height: 100%;
+            float: right;
+            right: 0.00%;
+            width: 50.00%;
+            background-color: rgba(227, 255, 216, 0.09);
+            -moz-border-radius: 15px;
+            border-radius: 15px;
+        }
+
+        .footer {
+            height: 20%;
+            display: block;
+            position: relative;
+            float: left;
+            left: 10.00%;
+            width: 80.00%;
+            background-color: transparent;
+        }
+
+        .green {
+            color: rgba(66, 195, 47, 0.83);
+            text-shadow: 0 0 3px rgb(66, 195, 47);
+        }
+
+        .red {
+            color: rgba(242, 17, 17, 0.83);
+            text-shadow: 0 0 3px #f21111;
+        }
+
+.pdiv {
+        border:1px dashed;
+        margin:-1px;
+}
+
+body {
+    background-image: url('Images/139.jpg');
+    color: rgba(157, 205, 212, 0.97);
+    text-shadow: 0 0 2px;
+    font-family: "Segoe UI", Verdana, Helvetica, Sans-Serif;
+    margin: 0;
+    line-height: 1;
+}
+
+.body-content {
+}
+
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+input,
+select,
+textarea {
+    max-width: 280px;
+}

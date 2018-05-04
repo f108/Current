@@ -1,0 +1,66 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+    Layout = null;
+}
+<header>
+    <link href="~/Content/Site.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-2.1.3.min.js"></script>
+    <script src="~/Scripts/jquery.signalR-2.2.0.js"></script>
+    <script src="/signalr/hubs"></script>
+
+    <script>
+        $(function () {
+            var chat = $.connection.QuotesHub;
+            chat.client.broadcastMessage = function (cur, cvalue, cvalue3, mvalueclass, state, statevalue, direction) {
+                $("#" + cur).find("#cvalue").text(cvalue);
+                $("#" + cur).find("#cvalue3").text(cvalue3);
+                $("#" + cur).find(".mcentral").toggleClass(mvalueclass);
+                $("#" + cur).find("#state").text(state);
+                $("#" + cur).find("#statevalue").text(statevalue);
+                $("#" + cur).find("#direction").html(direction);
+                $("#" + cur).find("#directionanimate").fadeTo(1000, 0);
+
+                $('#discussion').append('<li><strong>' + cur
+                    + '</strong>:&nbsp;&nbsp;' + cvalue + '</li>');
+            };
+            $.connection.hub.start().done(function () {
+               /* $('#swendmessage').click(function () {
+                    chat.server.send($('#displayname').val(), $('#message').val());
+                    $('#message').val('').focus();
+                });*/
+            });
+        });
+
+
+    </script>
+
+</header>
+
+@ViewData["Message"]
+
+<div style="width:100%; height:100%">
+    <div class="header">
+        @Math.Truncate(2.9)
+    </div>
+    <div class="wrapper">
+        <div class="left" id="USD">
+            <script>
+                $('#USD').load("/Home/CurTable?currency=USD")
+            </script>
+        </div>
+        <div class="right" id="EUR">
+            <script>
+                $('#EUR').load("/Home/CurTable?currency=EUR")
+            </script>
+        </div>
+    </div>
+    <div class="footer">
+        footer
+    </div>
+</div>
+<div class="row">
+    <div class="container">
+        <ul id="discussion"></ul>
+    </div>
+
+</div>

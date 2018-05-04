@@ -1,0 +1,49 @@
+﻿@{
+    Layout = null;
+}
+<link href="~/Content/Site.css?ver=@Environment.TickCount.ToString()" rel="stylesheet" />
+
+<div style="width:50%; height:60%; border: 1px dashed">
+
+    <div class="mcdiv">
+        <div class="mcheader">
+            <div class="mchleft">
+                <span class="mccurname" id="curname">@ViewData["curname"]</span><span class="mcdirection_animated" id="direction">@ViewData["direction"]</span>
+            </div>
+            <div class="mchright">
+                <span class="mcstate" id="state">@ViewData["state"]</span><span class="mcstatevalue" id="statevalue">@ViewData["statevalue"]</span>
+            </div>
+            <div class="mchleft"></div>
+        </div>
+        <div class="mccentral">
+            <div class="mcvalue" id="cvalue">@ViewData["cvalue"]</div>
+            <div class="mcvalue3" id="cvalue3">6</div>
+        </div>
+        <div class="mcfooter">
+            <div class="mcftop">
+                <div class="mcfcaption">*</div>
+                <div class="mcfcontent">
+                    <div class="mcfcrow1">
+                        <div class="mcfcrow1state rowvalue"><span></span><span id="todstate">@ViewData["todstate"]</span></div>
+                        <div class="mcfcrow1value rowvalue"><span></span><span id="todvalue">@ViewData["todvalue"]</span></div>
+                        <div class="mcfcrow1percent rowvalue"><span></span><span id="todpercent">@ViewData["todpercent"]</span></div>
+                    </div>
+                    <div class="mcfcrow2">
+                        <div class="mcfcrow2open rowvalue"><span>Open:</span><span id="todopen">@ViewData["todopen"]</span></div>
+                        <div class="mcfcrow2min rowvalue"><span>Min:</span><span id="todmin">@ViewData["todmin"]</span></div>
+                        <div class="mcfcrow2max rowvalue"><span>Max:</span><span id="todmax">@ViewData["todmax"]</span></div>
+                    </div>
+                    <div class="mcfcrow3">
+                        <div class="mcfcrow3prevclose rowvalue"><span>Prev.close:</span><span id="todprevclose">@ViewData["todprevclose"]</span></div>
+                        <div class="mcfcrow3percent rowvalue"><span></span><span id="todprevpercent">@ViewData["todprevpercent"]</span></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+</div>
