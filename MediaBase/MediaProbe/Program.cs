@@ -638,8 +638,7 @@ namespace MediaProbe
             }
             thumb = newImage;
 
-            // thumb = img.GetThumbnailImage(NewWidth, NewHeight, null, IntPtr.Zero);
-            MemoryStream memStream = new MemoryStream(); //thumb.Save(memStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+            MemoryStream memStream = new MemoryStream();
             for (long L = 75; L > 10; L -= 10)
             {
                 EncoderParameter myEncoderParameter;
