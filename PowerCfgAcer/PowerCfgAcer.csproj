@@ -50,7 +50,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Rud3boy-Mac-Apps-Launcher.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -313,7 +314,7 @@
     <None Include="Resources\Robotic pet.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Rud3boy-Mac-Apps-Launcher.ico" />
+    <Content Include="Resources\Rud3boy-Mac-Apps-Launcher.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
