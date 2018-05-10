@@ -125,7 +125,6 @@ namespace ExternalMouse
                 bw.Write((UInt32)buf.Length);
                 bw.Write(buf, 0, (int)ms.Length);
                 bw.Flush();
-                Program.PostLog("IMAGE size="+ buf.Length);
             }
         }
 
@@ -231,22 +230,15 @@ namespace ExternalMouse
                 ScreenCount = br.ReadInt32();
                 for (int i=0; i<ScreenCount; i++)
                 {
-                    
                     int msLength = (int)br.ReadUInt32();
                     byte[] buf = br.ReadBytes(msLength);
                     MemoryStream mss = new MemoryStream(buf);
-
-                    Program.PostLog("LOAD IMAGE size=" + buf.Length);
-                    //mss.SetLength(msLength);
-                    //mss.Read(buf, 0, msLength);
-                    //mss.Seek(0, SeekOrigin.Begin);
-                    img = new Bitmap(mss);// Image.FromStream(mss, true, false);
+                    img = new Bitmap(mss);
                     screenInfo[i].SetScreenshot(img);
                 }
             };
             controlHostUpdateCallback();
             Program.destopsForm.AddOrUpdate(this);
-            Program.PostLog("ping send");
         }
 
         public void Send(byte[] data)
