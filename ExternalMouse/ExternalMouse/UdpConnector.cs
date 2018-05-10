@@ -14,45 +14,45 @@ namespace ExternalMouse
 {
     struct DatagramPacket
     {
-        public string destination;
+        public IPAddress destination;
         public byte[] data;
-        public bool sendUnencrypted;
     }
     class UdpConnector
     {
         ProcessInvitationBroadcastResponse IBRcallback;
 
-        public const byte INVITATION_BROADCAST = 0x0001;
-        public const byte INVITATION_RESPONSE = 0x0002;
-        public const byte SHOW_PASSKEY = 0x0003;
-        public const byte CHECK_PASSKEY = 0x0004;
+        public const byte INVITATION_BROADCAST = 0x01;
+        public const byte INVITATION_RESPONSE = 0x02;
+        public const byte SHOW_PASSKEY = 0x03;
+        public const byte CHECK_PASSKEY = 0x04;
+        public const byte CONNECT_REQUEST = 0x05;
 
         public UdpConnector()
         {
-            AESCrypto.SetCodeword("pass");
-
-            sender = new UdpClient();
-            sender.DontFragment = true;
+            //
         }
 
         ConcurrentQueueWithEvent<DatagramPacket> SendQueue = new ConcurrentQueueWithEvent<DatagramPacket>(); 
         int listenPort = Properties.Settings.Default.listenPort;
         UdpClient listener;
         UdpClient sender;
-        AES AESCrypto = new AES();
 
-        public void SetCodeword(string codeword)
-        {
-            AESCrypto.SetCodeword(codeword);
-        }
         public void Open()
         {
+            sender = new UdpClient
+            {
+                //DontFragment = true,
+                EnableBroadcast = true,
+                
+            };
+            sender.AllowNatTraversal(true);
             listener = new UdpClient(listenPort);
-            new Thread(() => StartListener()).Start();
-            new Thread(() => sendThread()).Start();
+            listener.AllowNatTraversal(true);
+            new Thread(() => ListenerThread()).Start();
+            new Thread(() => SenderThread()).Start();
         }
         public void Close()
-        { 
+        {
             listener.Close();
             sender.Close();
         }
@@ -63,12 +63,11 @@ namespace ExternalMouse
             byte[] bytes = { 0x01 };
             SendQueue.Enqueue(new DatagramPacket
             {
-                destination = "255.255.255.255",
-                data = bytes,
-                sendUnencrypted = true
+                destination = IPAddress.Parse( "255.255.255.255"),
+                data = bytes
             });
         }
-        private void StartListener()
+        private void ListenerThread()
         {
             Debug.WriteLine("Start UDP listener");
 
@@ -84,16 +83,11 @@ namespace ExternalMouse
                 try
                 {
                     byte[] bytes = listener.Receive(ref groupEP);
+                    Program.PostLog("received "+bytes.Length + " bytes.");
+                    //if (localIPs.Contains(groupEP.Address)) continue;
 
-                    if (localIPs.Contains(groupEP.Address)) continue;
+                    if (Program.pairedHosts.TryProcessMessage(groupEP.Address, bytes)) continue;
 
-                    try
-                    { // try to decrypt aes
-                        byte[] data = AESCrypto.Decrypt(bytes);
-                        MouseControl.ProcessReceivedMessage(data);// data);
-                        continue;
-                    }
-                    catch { };
                     if (bytes.Length<1)
                     {
                         continue;
@@ -102,11 +96,11 @@ namespace ExternalMouse
                     switch (bytes[0])
                     {
                         case INVITATION_BROADCAST: // invitation 
-                            Program.PostLog("incoming INVITATION_BROADCAST");
+                            Program.PostLog("incoming INVITATION_BROADCAST from " + groupEP.Address.ToString());
                             SendQueue.Enqueue(new DatagramPacket {
-                                destination = groupEP.Address.ToString(),
-                                data = AddingNewHost.MakeResponseOnInvitationBroadcast(bytes),
-                                sendUnencrypted = true });
+                                destination = groupEP.Address,
+                                data = AddingNewHost.MakeResponseOnInvitationBroadcast(bytes)
+                            });
                             break;
                         case INVITATION_RESPONSE: // response to invitation
                             Program.PostLog("incoming INVITATION_RESPONSE");
@@ -116,7 +110,10 @@ namespace ExternalMouse
                             Program.PostLog("incoming SHOW_PASSKEY");
                             Program.ShowPasskey();
                             break;
-
+                        case CONNECT_REQUEST: // 
+                            Program.PostLog("incoming CONNECT_REQUEST");
+                            Program.destopsForm.PopupBroadcastNotification(groupEP.Address, bytes);
+                            break;
                     }
 
 
@@ -131,42 +128,28 @@ namespace ExternalMouse
 
         }
 
-        private void _Send(string dest, byte[] buf, int length)
+        private void SenderThread()
         {
-            //byte[] encryptedbuf = RemoteRSA.Encrypt(buf, true);
-            //sender.Send(encryptedbuf, encryptedbuf.Length, dest, listenPort);
-            //byte[] data = AESCrypto.Encrypt(buf);
-            //sender.Send(data, data.Length, dest, listenPort);
-        }
-
-        private void sendThread()
-        {
-            DatagramPacket dp;
-            for (;Program.inProgress;)
+            for (; Program.inProgress;)
             {
-                if (SendQueue.IsEmpty)
-                {
-                    if (!SendQueue.WaitOne(1000)) continue;
-                };
-                if (SendQueue.TryDequeue(out dp))
-                {
-                    if (dp.sendUnencrypted)
-                        sender.Send(dp.data, dp.data.Length, dp.destination, listenPort);
-                    else
-                    {
-                        byte[] data = AESCrypto.Encrypt(dp.data);
-                        sender.Send(data, data.Length, dp.destination, listenPort);
-                    }
+                if (SendQueue.IsEmpty && !SendQueue.WaitOne(1000)) continue;
 
+                if (SendQueue.TryDequeue(out DatagramPacket dp))
+                {
+                    sender.Send(dp.data, dp.data.Length, new IPEndPoint(dp.destination, listenPort));
+                    Program.PostLog("sended " + dp.data.Length + " bytes.");
                 }
-                    //_Send(dp.destination, dp.data, dp.data.Length);
             }
         }
 
-        public void Send(string dest, byte[] buf, bool SendUnencrypted=false)
+        public void Send(string dest, byte[] buf)
         {
-            SendQueue.Enqueue(new DatagramPacket { destination = dest, data = buf, sendUnencrypted = SendUnencrypted });
+            SendQueue.Enqueue(new DatagramPacket { destination = IPAddress.Parse(dest), data = buf });
         }
 
+        public void Send(IPAddress dest, byte[] buf)
+        {
+            SendQueue.Enqueue(new DatagramPacket { destination = dest, data = buf });
+        }
     }
 }

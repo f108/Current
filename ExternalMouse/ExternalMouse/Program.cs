@@ -8,13 +8,14 @@ namespace ExternalMouse
 {
     static class Program
     {
+        public static int ScreenshotHeight = 90;
         static public bool inProgress = true;
-        public static MouseControl Hook = new MouseControl();
+        public static MouseKeyboardControl Hook = new MouseKeyboardControl();
         public static UdpConnector udpConnector = new UdpConnector();
         public static ExternMouseForm emf;
         public static DesktopsForm destopsForm;
         public static ShowPasskey showPasskey;
-        public static PairedHosts pairedHosts = new PairedHosts();
+        public static PairedHosts pairedHosts;// = new PairedHosts();
 
         public static string GroupName;
         public static string passkey;
@@ -35,6 +36,9 @@ namespace ExternalMouse
             showPasskey = new ShowPasskey();
             destopsForm = new DesktopsForm();
             destopsForm.Show();
+
+            pairedHosts = new PairedHosts();
+
             emf = new ExternMouseForm();
             Application.Run(emf);
             inProgress = false;

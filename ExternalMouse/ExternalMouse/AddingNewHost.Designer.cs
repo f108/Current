@@ -69,7 +69,18 @@
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
             this.listView1.SelectedIndexChanged += new System.EventHandler(this.listView1_SelectedIndexChanged);
+            this.listView1.Click += new System.EventHandler(this.listView1_Click);
             this.listView1.DoubleClick += new System.EventHandler(this.listView1_DoubleClick);
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "Host name";
+            this.columnHeader1.Width = 200;
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "IP address";
+            this.columnHeader2.Width = 200;
             // 
             // AddingNewHost
             // 

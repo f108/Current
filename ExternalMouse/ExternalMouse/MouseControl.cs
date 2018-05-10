@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace ExternalMouse
 {
-    class MouseControl
+    class MouseKeyboardControl
     {
         public AutoResetEvent PowerPressed;
         public Queue<String> strq = new Queue<string>();
@@ -95,13 +93,13 @@ namespace ExternalMouse
         public mouseHookProc mouse_delegate_callback;
         public keyboardHookProc keyboard_delegate_callback;
 
-        public MouseControl()
+        public MouseKeyboardControl()
         {
             PowerPressed = new AutoResetEvent(false);
             hook();
         }
 
-        ~MouseControl()
+        ~MouseKeyboardControl()
         {
             unhook();
         }
@@ -110,7 +108,7 @@ namespace ExternalMouse
         {
             IntPtr hInstance = LoadLibrary("User32");
             mouse_delegate_callback = new mouseHookProc(hookProc);
-            //mouse_hook = SetWindowsHookEx(WH_MOUSE_LL, mouse_delegate_callback, hInstance, 0);
+            mouse_hook = SetWindowsHookEx(WH_MOUSE_LL, mouse_delegate_callback, hInstance, 0);
 
             keyboard_delegate_callback = new keyboardHookProc(hookKbdProc);
             //keyboard_hook = SetWindowsHookEx(WH_KEYBOARD_LL, keyboard_delegate_callback, hInstance, 0);
@@ -127,23 +125,26 @@ namespace ExternalMouse
         int Ym = 0;
         public int hookProc(int code, uint wParam, ref MSLLHOOKSTRUCT lParam)
         {
+
             try
             {
-                //Program.PostLog((wParam<<1).ToString("X") + " " + lParam.dwExtraInfo + " " + lParam.mouseData.ToString("X") + " " + lParam.flags.ToString("X") + " " + lParam.pt.x + "," + lParam.pt.y);
-                //Debug.WriteLine(wParam.ToString("X")+" "+ lParam.dwExtraInfo+" "+lParam.mouseData+" " +lParam.pt.x+","+lParam.pt.y);
 
-                if (Xe > 0 || lParam.pt.x > DesktopMaxX)
+                if (!Program.pairedHosts.isLocalDesktop(lParam.pt.x, lParam.pt.y))
                 {
                     isLocalScreen = false;
+                    Program.PostLog("pt=" + lParam.pt.x + ", " + lParam.pt.y);
+                    Program.PostLog("Bounds: " + Program.pairedHosts.LeftBound + " " + Program.pairedHosts.RightBound);
                     Program.PostLog("Xe=" + Xe + "  Ye=" + Ye + " " + "Xm=" + Xm + "  Ym=" + Ym);
 
                     Xe += lParam.pt.x - Xm;
                     Ye += lParam.pt.y - Ym;
+                    Xe = Program.pairedHosts.RightBound > Xe ? Xe : Program.pairedHosts.RightBound;
+                    Xe = Program.pairedHosts.LeftBound < Xe ? Xe : Program.pairedHosts.LeftBound;
                     if (Ye < 0) Ye = 0;
 
                     Program.PostLog("Xe="+Xe + "  Ye=" + Ye + " " + "Xm=" + Xm + "  Ym=" + Ym);
 
-                    SendMouseMessage(Properties.Settings.Default.pairedHost, wParam, ref lParam, Xe, Ye);
+                    SendMouseMessage(wParam, ref lParam, Xe, Ye);
                     return 1;
                 }
                 else
@@ -165,14 +166,14 @@ namespace ExternalMouse
             try
             {
                 //Program.PostLog("KBD: "+lParam.vkCode.ToString("X") + " " + lParam.scanCode.ToString("X")+" "+lParam.flags.ToString("X"));
-                SendKeyboardMessage(Properties.Settings.Default.pairedHost, wParam, ref lParam);
-                return 1;
+                SendKeyboardMessage(wParam, ref lParam, Xe, Ye);
+                    return 1;
             }
             catch { };
             return CallNextHookEx(keyboard_hook, code, wParam, ref lParam);
         }
 
-        static private void SendMouseMessage(string dest, uint wParam, ref MSLLHOOKSTRUCT lParam, int Xe, int Ye)
+        static private void SendMouseMessage(uint wParam, ref MSLLHOOKSTRUCT lParam, int Xe, int Ye)
         {
             UInt32 dwFlags=0;
             Int32 mouseData = (Int32)lParam.mouseData;
@@ -189,11 +190,11 @@ namespace ExternalMouse
                 bw.Write(mouseData);
                 bw.Write(dwFlags);
                 bw.Write(lParam.time);
-                Program.udpConnector.Send(dest, ms.ToArray());
+                Program.pairedHosts.CheckAndSendIfExternalDesktop(ms.ToArray(), Xe, Ye);
             }
         }
 
-        static private void SendKeyboardMessage(string dest, uint wParam, ref KBDLLHOOKSTRUCT lParam)
+        static private void SendKeyboardMessage(uint wParam, ref KBDLLHOOKSTRUCT lParam, int Xe, int Ye)
         {
             UInt32 dwFlags = 0;
             dwFlags = (lParam.flags & 0x80) >> 6;
@@ -205,20 +206,7 @@ namespace ExternalMouse
                 bw.Write((UInt16)lParam.scanCode);
                 bw.Write(dwFlags);
                 bw.Write(lParam.time);
-                Program.udpConnector.Send(dest, ms.ToArray());
-            }
-        }
-
-        public void SendScreenShot(string dest, Bitmap bmp)
-        {
-            using (MemoryStream ms = new MemoryStream())
-            using (BinaryWriter bw = new BinaryWriter(ms))
-            {
-                //bw.Write((UInt32)InputType.CONTROL);
-                bmp.Save(ms, ImageFormat.Jpeg);
-                Program.udpConnector.Send(dest, ms.ToArray());
-
-                //Program.PostLog(lParam.mouseData.ToString("X") + " " + dwFlags.ToString("X") + " " + lParam.time);
+                Program.pairedHosts.CheckAndSendIfExternalDesktop(ms.ToArray(), Xe, Ye);
             }
         }
 
@@ -250,11 +238,7 @@ namespace ExternalMouse
                         input.Data.Mouse.Time = (uint)Environment.TickCount;
                         SendInput(1, ref input, Marshal.SizeOf(input));
                     }
-                    else if (input.Type == (uint)InputType.CONTROL)
-                    {
-                        
 
-                    }
                 }
             }
         }
@@ -310,7 +294,7 @@ namespace ExternalMouse
             MOUSE = 0,
             KEYBOARD = 1,
             HARDWARE = 2,
-            CONTROL = 3
+            CONTROL = 255
         }
         struct INPUT
         {

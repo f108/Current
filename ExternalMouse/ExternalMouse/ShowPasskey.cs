@@ -21,7 +21,7 @@ namespace ExternalMouse
         {
             Random rnd = new Random();
             Program.passkey = rnd.Next(10000, 99999).ToString();
-            Program.udpConnector.SetCodeword(Program.passkey);
+            //Program.udpConnector.SetCodeword(Program.passkey);
             if (!this.IsHandleCreated) this.CreateHandle();
             this.Invoke( new MethodInvoker(() =>
             {

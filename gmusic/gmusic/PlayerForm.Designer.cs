@@ -40,9 +40,10 @@
             this.webBrowser1.Location = new System.Drawing.Point(0, 0);
             this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
             this.webBrowser1.Name = "webBrowser1";
+            this.webBrowser1.ScriptErrorsSuppressed = true;
             this.webBrowser1.Size = new System.Drawing.Size(630, 361);
             this.webBrowser1.TabIndex = 0;
-            this.webBrowser1.Url = new System.Uri("https://play.google.com/store/music", System.UriKind.Absolute);
+            this.webBrowser1.Url = new System.Uri("https://play.google.com/music/listen?u=0#/home", System.UriKind.Absolute);
             this.webBrowser1.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.webBrowser1_DocumentCompleted);
             this.webBrowser1.DocumentTitleChanged += new System.EventHandler(this.webBrowser1_DocumentTitleChanged);
             this.webBrowser1.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.webBrowser1_PreviewKeyDown);
@@ -67,7 +68,7 @@
             this.textBox1.TabIndex = 2;
             this.textBox1.Visible = false;
             // 
-            // Form1
+            // PlayerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -76,7 +77,7 @@
             this.Controls.Add(this.button1);
             this.Controls.Add(this.webBrowser1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Name = "Form1";
+            this.Name = "PlayerForm";
             this.Text = "gmo player";
             this.Shown += new System.EventHandler(this.Form1_Shown);
             this.LocationChanged += new System.EventHandler(this.Form1_LocationChanged);

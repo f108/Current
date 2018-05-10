@@ -19,7 +19,7 @@ namespace ExternalMouse
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Program.udpConnector.SetCodeword(textBox1.Text);
+           // Program.udpConnector.SetCodeword(textBox1.Text);
             Close();
         }
     }

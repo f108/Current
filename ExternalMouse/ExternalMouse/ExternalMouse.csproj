@@ -91,6 +91,7 @@
       <DependentUpon>ExternMouseForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers.cs" />
+    <Compile Include="Host.cs" />
     <Compile Include="HostDesktop.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -174,9 +175,6 @@
   <ItemGroup>
     <Analyzer Include="..\packages\Microsoft.DependencyValidation.Analyzers.0.9.0\analyzers\dotnet\cs\Microsoft.DependencyValidation.Analyzers.resources.dll" />
     <Analyzer Include="..\packages\Microsoft.DependencyValidation.Analyzers.0.9.0\analyzers\dotnet\Microsoft.DependencyValidation.Analyzers.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\AppIcon.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\RemoteDesktop.ico" />

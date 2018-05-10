@@ -18,6 +18,18 @@ namespace ExternalMouse
         public AddingNewHost()
         {
             InitializeComponent();
+
+            ListViewItem lvi = new ListViewItem();
+            lvi.Text = "SMTHi7";
+            lvi.Tag = "SMTHi7";
+            lvi.SubItems.Add("178.218.120.29");
+            listView1.Items.Add(lvi);
+
+            lvi = new ListViewItem();
+            lvi.Text = "SMTHi7";
+            lvi.Tag = "SMTHi7";
+            lvi.SubItems.Add("192.168.0.8");
+            listView1.Items.Add(lvi);
         }
         public void _ProcessInvitationBroadcastResponse(byte[] data, IPEndPoint ep)
         {
@@ -68,12 +80,17 @@ namespace ExternalMouse
             using (MemoryStream ms = new MemoryStream())
             using (BinaryWriter bw = new BinaryWriter(ms))
             {
-                bw.Write(UdpConnector.SHOW_PASSKEY);
-                Program.udpConnector.Send(ipaddress, ms.ToArray(), true);
+                bw.Write(UdpConnector.CONNECT_REQUEST);
+                Program.udpConnector.Send(ipaddress, ms.ToArray());
             }
+            Program.pairedHosts.AddHostByIP(IPAddress.Parse(ipaddress));
+        }
 
-            CodewordInputDialog codewordInputDialog = new CodewordInputDialog();
-            codewordInputDialog.ShowDialog();
+        private void listView1_Click(object sender, EventArgs e)
+        {
+            //if (listView1.SelectedItems.Count < 1) return;
+            //string ipaddress = listView1.SelectedItems[0].SubItems[1].Text;
+            //Program.pairedHosts.Ping(IPAddress.Parse( ipaddress));
         }
     }
 }

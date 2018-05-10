@@ -33,7 +33,7 @@
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.NotifyIconMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.connectNewDesktopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.FlowPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.FlowPanel = new System.Windows.Forms.Panel();
             this.AddNewDesktopButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label_GroupName = new System.Windows.Forms.Label();
@@ -44,6 +44,9 @@
             // 
             // notifyIcon1
             // 
+            this.notifyIcon1.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.notifyIcon1.BalloonTipText = "asdas";
+            this.notifyIcon1.BalloonTipTitle = "asdas";
             this.notifyIcon1.ContextMenuStrip = this.NotifyIconMenu;
             this.notifyIcon1.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon1.Icon")));
             this.notifyIcon1.Text = "Remote Mouse";
@@ -68,7 +71,7 @@
             // 
             this.FlowPanel.AllowDrop = true;
             this.FlowPanel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.FlowPanel.Location = new System.Drawing.Point(0, 0);
+            this.FlowPanel.Location = new System.Drawing.Point(0, 5);
             this.FlowPanel.Name = "FlowPanel";
             this.FlowPanel.Size = new System.Drawing.Size(724, 87);
             this.FlowPanel.TabIndex = 5;
@@ -111,9 +114,9 @@
             this.BottomPanel.Controls.Add(this.label_GroupName);
             this.BottomPanel.Controls.Add(this.label1);
             this.BottomPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.BottomPanel.Location = new System.Drawing.Point(0, 87);
+            this.BottomPanel.Location = new System.Drawing.Point(0, 92);
             this.BottomPanel.Name = "BottomPanel";
-            this.BottomPanel.Size = new System.Drawing.Size(724, 50);
+            this.BottomPanel.Size = new System.Drawing.Size(724, 45);
             this.BottomPanel.TabIndex = 7;
             // 
             // DesktopsForm
@@ -127,7 +130,7 @@
             this.Controls.Add(this.FlowPanel);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "DesktopsForm";
-            this.ShowInTaskbar = false;
+            this.Padding = new System.Windows.Forms.Padding(0, 5, 0, 0);
             this.Text = "DesktopsForm";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DesktopsForm_FormClosing);
             this.Load += new System.EventHandler(this.DesktopsForm_Load);
@@ -144,7 +147,7 @@
         private System.Windows.Forms.NotifyIcon notifyIcon1;
         private System.Windows.Forms.ContextMenuStrip NotifyIconMenu;
         private System.Windows.Forms.ToolStripMenuItem connectNewDesktopToolStripMenuItem;
-        private System.Windows.Forms.FlowLayoutPanel FlowPanel;
+        private System.Windows.Forms.Panel FlowPanel;
         private System.Windows.Forms.Button AddNewDesktopButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label_GroupName;
