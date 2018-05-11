@@ -32,6 +32,7 @@ namespace ExternalMouse
         public string Name;
         public string MachineName;
         public IPAddress ipAddress;
+        public bool isLocalhost = false;
         public int Position;
         public int Width = 0;
         public int LeftBound;

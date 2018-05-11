@@ -41,9 +41,8 @@ namespace ExternalMouse
         {
             sender = new UdpClient
             {
-                //DontFragment = true,
+                DontFragment = false,
                 EnableBroadcast = true,
-                
             };
             sender.AllowNatTraversal(true);
             listener = new UdpClient(listenPort);
@@ -63,7 +62,7 @@ namespace ExternalMouse
             byte[] bytes = { 0x01 };
             SendQueue.Enqueue(new DatagramPacket
             {
-                destination = IPAddress.Parse( "255.255.255.255"),
+                destination = IPAddress.Broadcast, //.Parse( "255.255.255.255"),
                 data = bytes
             });
         }
@@ -75,7 +74,7 @@ namespace ExternalMouse
             localIPs.AddRange(Dns.GetHostEntry(Dns.GetHostName()).AddressList.
                 Where(s => s.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork));
 
-            IPEndPoint groupEP = new IPEndPoint(IPAddress.IPv6None, listenPort);
+            IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, listenPort);
 
             while (Program.inProgress)
             {
@@ -83,7 +82,7 @@ namespace ExternalMouse
                 try
                 {
                     byte[] bytes = listener.Receive(ref groupEP);
-                    Program.PostLog("received "+bytes.Length + " bytes.");
+                    Program.PostLog("<<< received "+bytes.Length + " bytes from " + groupEP.Address.ToString());
                     //if (localIPs.Contains(groupEP.Address)) continue;
 
                     if (Program.pairedHosts.TryProcessMessage(groupEP.Address, bytes)) continue;
@@ -122,6 +121,7 @@ namespace ExternalMouse
                 catch (Exception e)
                 {
                     //Thread.Sleep(200);
+                    Program.PostLog("UDPC Exception:"+e.Message);
                     Debug.WriteLine(e.ToString());
                 }
             };
@@ -130,14 +130,15 @@ namespace ExternalMouse
 
         private void SenderThread()
         {
+            int ret;
             for (; Program.inProgress;)
             {
                 if (SendQueue.IsEmpty && !SendQueue.WaitOne(1000)) continue;
 
                 if (SendQueue.TryDequeue(out DatagramPacket dp))
                 {
-                    sender.Send(dp.data, dp.data.Length, new IPEndPoint(dp.destination, listenPort));
-                    Program.PostLog("sended " + dp.data.Length + " bytes.");
+                    ret = sender.Send(dp.data, dp.data.Length, new IPEndPoint(dp.destination, listenPort));
+                    Program.PostLog(">>> sended " + ret + " from " + dp.data.Length + " bytes to " + dp.destination.ToString());
                 }
             }
         }

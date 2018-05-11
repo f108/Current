@@ -27,29 +27,24 @@ namespace ExternalMouse
 
         public void AddOrUpdate(Host host)
         {
+            if (FlowPanel.InvokeRequired)
+            {
+                Invoke(new MethodInvoker(() => _addOrUpdate(host)));
+            }
+            else _addOrUpdate(host);
+        }
+
+        public void _addOrUpdate(Host host)
+        {
+            Reorder();
+
             if (FlowPanel.Controls.ContainsKey(host.ipAddress.ToString()))
             {
-                FlowPanel.Invoke(new MethodInvoker(() =>
-                {
-                    FlowPanel.Controls[host.ipAddress.ToString()].Update();
-                    Reorder();
-                }));
+                ((HostDesktop) FlowPanel.Controls[host.ipAddress.ToString()]).Update();
                 return;
             }
 
-            if (FlowPanel.InvokeRequired)
-            {
-                FlowPanel.Invoke( new MethodInvoker(() =>
-                {
-                    FlowPanel.Controls.Add(new HostDesktop(host));
-                    Reorder();
-                }));
-            }
-            else
-            {
-                this.FlowPanel.Controls.Add(new HostDesktop(host));
-                Reorder();
-            };
+            FlowPanel.Controls.Add(new HostDesktop(host));
 
 /*            foreach (Control c in this.FlowPanel.Controls)
             {
@@ -131,7 +126,15 @@ namespace ExternalMouse
             Reorder();
         }
 
+        
         void Reorder()
+        {
+            if (InvokeRequired)
+                Invoke(new MethodInvoker(() => _reorder()));
+            else _reorder();
+        }
+
+        void _reorder()
         {
             int offset = 0;
             foreach (HostDesktop hd in FlowPanel.Controls.OfType<HostDesktop>().OrderBy(c => c.Location.X+c.Width/2))

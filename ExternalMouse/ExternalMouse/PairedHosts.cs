@@ -25,7 +25,6 @@ namespace ExternalMouse
         public const byte MSG_RESPONSESCREENSHOT       = 0x06;
 
         private Dictionary<IPAddress, Host> _pairedHost = new Dictionary<IPAddress, Host>();
-        private int LocalDesktopIndex = 0;
 
         public int LeftBound;
         public int RightBound;
@@ -57,7 +56,9 @@ namespace ExternalMouse
                 });
                 host.ScreenCount++;
             }
+            host.isLocalhost = true;
             _pairedHost.Add(host.ipAddress, host);
+            LocalRightBound = _pairedHost[IPAddress.Loopback].Width;
             Program.destopsForm.AddOrUpdate(host);
             SaveConfig();
         }
@@ -65,6 +66,7 @@ namespace ExternalMouse
         void ControlReorderCallback(List<string> neworder)
         {
             int localhostIndex = neworder.IndexOf(IPAddress.Loopback.ToString());
+            if (localhostIndex < 0) return;
             LocalLeftBound = 0;
             LocalRightBound = _pairedHost[IPAddress.Loopback].Width;
             int bound = 0;
@@ -93,14 +95,14 @@ namespace ExternalMouse
 
         public bool isLocalDesktop(int x, int y)
         {
-            //Program.PostLog("Local area: " + LocalLeftBound + "-" + LocalRightBound + " check:"+x);
+            Program.PostLog("Local area: " + LocalLeftBound + "-" + LocalRightBound + " check:"+x);
             return LocalLeftBound <= x && x <= LocalRightBound;
         }
 
         public bool CheckAndSendIfExternalDesktop(byte[] data, int x, int y)
         {
-            IEnumerable<Host> host = _pairedHost.Values.Where(h => h.LeftBound <= x && x <= h.RightBound);
-            if (host.Count() < 1) return false;
+            IEnumerable<Host> host = _pairedHost.Values.Where(h => h.LeftBound <= x && x <= h.RightBound && !h.isLocalhost);
+            if (host.Count() < 1 || host.First().isLocalhost) return false;
             Program.PostLog("SEND: " + host.First().ipAddress.ToString()+ "  x=" + x);
             host.First().Send(data);
             return true;
@@ -214,32 +216,33 @@ namespace ExternalMouse
         {
             if (data[0] != (byte)MouseKeyboardControl.InputType.CONTROL) return false;
             Host host = _pairedHost[address];
+            Program.PostLog("CMD byte "+ data[1]);
             switch (data[1])
             {
                 case MSG_PING:
-                    host.Send(new byte[] { (byte)MouseKeyboardControl.InputType.CONTROL, MSG_PINGRESPONSE, 0x00, 0x00 });
                     Program.PostLog("ping received ");
+                    host.Send(new byte[] { (byte)MouseKeyboardControl.InputType.CONTROL, MSG_PINGRESPONSE, 0x00, 0x00 });
                     break;
                 case MSG_PINGRESPONSE:
-                    host.LastPing = Environment.TickCount;
                     Program.PostLog("ping response received ");
+                    host.LastPing = Environment.TickCount;
                     break;
                 case MSG_REQUESTDESKTOPPARAMS:
-                    host.DoResponseDesktopParams(_pairedHost[IPAddress.Loopback]);
                     Program.PostLog("MSG_REQUESTDESKTOPPARAMS received ");
+                    host.DoResponseDesktopParams(_pairedHost[IPAddress.Loopback]);
                     break;
                 case MSG_RESPONSEDESKTOPPARAMS:
-                    host.DoParseDesktopParams(data);
                     Program.PostLog("MSG_DESKTOPPARAMS received ");
+                    host.DoParseDesktopParams(data);
                     Program.destopsForm.AddOrUpdate(host);
                     break;
                 case MSG_REQUESTSCREENSHOT:
-                    host.DoResponseScreenshotRequest(_pairedHost[IPAddress.Loopback], data);
                     Program.PostLog("MSG_REQUESTSCREENSHOT received ");
+                    host.DoResponseScreenshotRequest(_pairedHost[IPAddress.Loopback], data);
                     break;
                 case MSG_RESPONSESCREENSHOT:
+                    Program.PostLog("========MSG_RESPONSESCREENSHOT received ");
                     host.DoParseScreenshotResponse(data);
-                    Program.PostLog("MSG_DESKTOPPARAMS received ");
                     break;
 
 
