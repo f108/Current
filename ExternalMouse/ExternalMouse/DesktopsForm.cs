@@ -123,18 +123,18 @@ namespace ExternalMouse
             HostDesktop c = e.Data.GetData(e.Data.GetFormats()[0]) as HostDesktop;
             c.Location = new Point(FlowPanel.PointToClient(new Point(e.X, e.Y)).X - c.mouseLDownPoint.X, 0);
             c.Capture = true;
-            Reorder();
+            Reorder(false);
         }
 
         
-        void Reorder()
+        void Reorder(bool isFinalPosition=true)
         {
             if (InvokeRequired)
-                Invoke(new MethodInvoker(() => _reorder()));
-            else _reorder();
+                Invoke(new MethodInvoker(() => _reorder(isFinalPosition)));
+            else _reorder(isFinalPosition);
         }
 
-        void _reorder()
+        void _reorder(bool isFinalPosition)
         {
             int offset = 0;
             foreach (HostDesktop hd in FlowPanel.Controls.OfType<HostDesktop>().OrderBy(c => c.Location.X+c.Width/2))
@@ -150,7 +150,7 @@ namespace ExternalMouse
             {
                 controls.Add(hd.Name);
             }
-            controlReorderCallback(controls);
+            if (isFinalPosition) controlReorderCallback(controls);
         }
 
     }

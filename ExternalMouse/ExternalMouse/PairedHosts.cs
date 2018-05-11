@@ -78,8 +78,9 @@ namespace ExternalMouse
                 bound += host.Width;
                 host.RightBound = bound;
                 bound += 1;
+                Program.PostLog("Reorder: host " + host.ipAddress.ToString() + " " + host.LeftBound + "-" + host.RightBound);
             }
-            RightBound = bound-1;
+            RightBound = bound;
             bound = -1;
             for (int i = localhostIndex-1; i>=0; i--)
             {
@@ -89,18 +90,20 @@ namespace ExternalMouse
                 bound -= host.Width;
                 host.LeftBound = bound;
                 bound -= 1;
+                Program.PostLog("Reorder: host " + host.ipAddress.ToString() + " " + host.LeftBound + "-" + host.RightBound);
             }
             LeftBound = bound+1;
         }
 
         public bool isLocalDesktop(int x, int y)
         {
-            Program.PostLog("Local area: " + LocalLeftBound + "-" + LocalRightBound + " check:"+x);
+            //Program.PostLog("Local area: " + LocalLeftBound + "-" + LocalRightBound + " check:"+x);
             return LocalLeftBound <= x && x <= LocalRightBound;
         }
 
         public bool CheckAndSendIfExternalDesktop(byte[] data, int x, int y)
         {
+            Program.PostLog("Bounds: " + LeftBound + "-" + RightBound + " check:" + x);
             IEnumerable<Host> host = _pairedHost.Values.Where(h => h.LeftBound <= x && x <= h.RightBound && !h.isLocalhost);
             if (host.Count() < 1 || host.First().isLocalhost) return false;
             Program.PostLog("SEND: " + host.First().ipAddress.ToString()+ "  x=" + x);
