@@ -19,15 +19,19 @@ namespace ExternalMouse
         {
             InitializeComponent();
 
-            ListViewItem lvi = new ListViewItem();
-            lvi.Text = "smthi7";
-            lvi.Tag = "smthi7";
+            ListViewItem lvi = new ListViewItem
+            {
+                Text = "smthi7",
+                Tag = "smthi7"
+            };
             lvi.SubItems.Add("192.168.0.8");
             listView1.Items.Add(lvi);
 
-            lvi = new ListViewItem();
-            lvi.Text = "dbserv";
-            lvi.Tag = "dbserv";
+            lvi = new ListViewItem
+            {
+                Text = "dbserv",
+                Tag = "dbserv"
+            };
             lvi.SubItems.Add("192.168.0.9");
             listView1.Items.Add(lvi);
         }
@@ -42,9 +46,11 @@ namespace ExternalMouse
                 bt = br.ReadByte();
                 str = br.ReadString();
             }
-            ListViewItem lvi = new ListViewItem();
-            lvi.Text = str.Split('|')[0];
-            lvi.Tag = str;
+            ListViewItem lvi = new ListViewItem
+            {
+                Text = str.Split('|')[0],
+                Tag = str
+            };
             lvi.SubItems.Add(ep.Address.ToString());
             listView1.Invoke(new MethodInvoker(() => { listView1.Items.Add(lvi); }));
         }
