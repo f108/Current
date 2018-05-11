@@ -22,12 +22,6 @@ namespace ExternalMouse
             ListViewItem lvi = new ListViewItem();
             lvi.Text = "SMTHi7";
             lvi.Tag = "SMTHi7";
-            lvi.SubItems.Add("178.218.120.29");
-            listView1.Items.Add(lvi);
-
-            lvi = new ListViewItem();
-            lvi.Text = "SMTHi7";
-            lvi.Tag = "SMTHi7";
             lvi.SubItems.Add("192.168.0.8");
             listView1.Items.Add(lvi);
         }
