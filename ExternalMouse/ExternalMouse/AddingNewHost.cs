@@ -20,9 +20,15 @@ namespace ExternalMouse
             InitializeComponent();
 
             ListViewItem lvi = new ListViewItem();
-            lvi.Text = "SMTHi7";
-            lvi.Tag = "SMTHi7";
+            lvi.Text = "smthi7";
+            lvi.Tag = "smthi7";
             lvi.SubItems.Add("192.168.0.8");
+            listView1.Items.Add(lvi);
+
+            lvi = new ListViewItem();
+            lvi.Text = "dbserv";
+            lvi.Tag = "dbserv";
+            lvi.SubItems.Add("192.168.0.9");
             listView1.Items.Add(lvi);
         }
         public void _ProcessInvitationBroadcastResponse(byte[] data, IPEndPoint ep)
