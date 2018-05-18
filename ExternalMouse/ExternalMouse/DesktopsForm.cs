@@ -36,26 +36,26 @@ namespace ExternalMouse
 
         public void _addOrUpdate(Host host)
         {
-            Reorder();
-
             if (FlowPanel.Controls.ContainsKey(host.ipAddress.ToString()))
             {
                 ((HostDesktop) FlowPanel.Controls[host.ipAddress.ToString()]).Update();
+                Reorder();
                 return;
             }
 
             FlowPanel.Controls.Add(new HostDesktop(host));
+            Reorder();
 
-/*            foreach (Control c in this.FlowPanel.Controls)
-            {
-                c.MouseDown += new MouseEventHandler(c_MouseDown);
-            }*/
+            /*            foreach (Control c in this.FlowPanel.Controls)
+                        {
+                            c.MouseDown += new MouseEventHandler(c_MouseDown);
+                        }*/
         }
 
         public void PopupBroadcastNotification(IPAddress address, byte[] bytes)
         {
-            DialogResult dialogResult = MessageBox.Show(address.ToString()+" wants to connect you to his mouse group", "Connection request", MessageBoxButtons.YesNo );
-            if (dialogResult==DialogResult.Yes)
+            //DialogResult dialogResult = MessageBox.Show(address.ToString()+" wants to connect you to his mouse group", "Connection request", MessageBoxButtons.YesNo );
+            if (true)//dialogResult==DialogResult.Yes)
             {
                 Program.pairedHosts.AddHostByIP(address);
                 Program.pairedHosts.InitiateKeyExchange(address);

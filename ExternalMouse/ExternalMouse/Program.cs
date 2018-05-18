@@ -52,7 +52,10 @@ namespace ExternalMouse
         }
         static public void PostLog(string str)
         {
-            emf.PostLog(str);
+            try
+            {
+                emf.PostLog(str);
+            } catch { };
         }
 
     }

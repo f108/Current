@@ -80,7 +80,7 @@ namespace ExternalMouse
                 bound += 1;
                 Program.PostLog("Reorder: host " + host.ipAddress.ToString() + " " + host.LeftBound + "-" + host.RightBound);
             }
-            RightBound = bound;
+            RightBound = bound-1;
             bound = -1;
             for (int i = localhostIndex-1; i>=0; i--)
             {
@@ -98,16 +98,23 @@ namespace ExternalMouse
         public bool isLocalDesktop(int x, int y)
         {
             //Program.PostLog("Local area: " + LocalLeftBound + "-" + LocalRightBound + " check:"+x);
-            return LocalLeftBound <= x && x <= LocalRightBound;
+            return LocalLeftBound < x && x <= LocalRightBound;
         }
 
+        public Host CheckHost(int x, int y)
+        {
+            IEnumerable<Host> host = _pairedHost.Values.Where(h => h.LeftBound <= x && x <= h.RightBound && !h.isLocalhost);
+            if (host.Count() < 1) return null;
+            Program.PostLog("Bounds: " + host.First().LeftBound + "-" + host.First().RightBound + " check:" + x);
+            return host.First();
+        }
         public bool CheckAndSendIfExternalDesktop(byte[] data, int x, int y)
         {
-            Program.PostLog("Bounds: " + LeftBound + "-" + RightBound + " check:" + x);
-            IEnumerable<Host> host = _pairedHost.Values.Where(h => h.LeftBound <= x && x <= h.RightBound && !h.isLocalhost);
-            if (host.Count() < 1 || host.First().isLocalhost) return false;
-            Program.PostLog("SEND: " + host.First().ipAddress.ToString()+ "  x=" + x);
-            host.First().Send(data);
+            //Program.PostLog("Bounds: " + LeftBound + "-" + RightBound + " check:" + x);
+            //IEnumerable<Host> host = _pairedHost.Values.Where(h => h.LeftBound <= x && x <= h.RightBound && !h.isLocalhost);
+            //if (host.Count() < 1 || host.First().isLocalhost) return false;
+            //Program.PostLog("SEND: " + host.First().ipAddress.ToString()+ "  x=" + x);
+            //host.First().Send(data);
             return true;
         }
         public void SaveConfig()

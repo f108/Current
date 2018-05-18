@@ -5,6 +5,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace ExternalMouse
 {
@@ -60,8 +61,6 @@ namespace ExternalMouse
         int Xe=0;
         int Ye=0;
 
-        int DesktopMaxX = 1366;//1920 + 1440;
-
         bool isLocalScreen = true;
 
         public struct POINT
@@ -113,6 +112,8 @@ namespace ExternalMouse
             keyboard_delegate_callback = new keyboardHookProc(hookKbdProc);
             //keyboard_hook = SetWindowsHookEx(WH_KEYBOARD_LL, keyboard_delegate_callback, hInstance, 0);
 
+            //Xprev = Cursor.Position.X;
+            //Yprev = Cursor.Position.Y;
         }
 
         public void unhook()
@@ -123,26 +124,33 @@ namespace ExternalMouse
 
         int Xm = 0;
         int Ym = 0;
+        int Xdelta = 0, Ydelta = 0, Xprev, Yprev;
         public int hookProc(int code, uint wParam, ref MSLLHOOKSTRUCT lParam)
         {
+            //Xdelta = lParam.pt.x - Xprev;
+            //Ydelta = lParam.pt.y - Yprev;
+
+            //Xprev = lParam.pt.x;
+            //Yprev = lParam.pt.y;
 
             try
             {
+                //Program.PostLog("local bounds= " + Program.pairedHosts.LocalLeftBound+ " "+Program.pairedHosts.LocalRightBound);
 
-                if (!Program.pairedHosts.isLocalDesktop(lParam.pt.x, lParam.pt.y))
+                if (Xe > Program.pairedHosts.LocalRightBound-1 || lParam.pt.x > Program.pairedHosts.LocalRightBound || Xe<0 || lParam.pt.x<1)
                 {
                     isLocalScreen = false;
-                    Program.PostLog("pt=" + lParam.pt.x + ", " + lParam.pt.y);
-                    Program.PostLog("Bounds: " + Program.pairedHosts.LeftBound + " " + Program.pairedHosts.RightBound);
                     Program.PostLog("Xe=" + Xe + "  Ye=" + Ye + " " + "Xm=" + Xm + "  Ym=" + Ym);
 
-                    Xe += lParam.pt.x - Xm;
+                    if (Xe <= 0 && lParam.pt.x < 1)
+                        Xe -= lParam.pt.x + Xm;
+                    else
+                        Xe += lParam.pt.x - Xm;
+
                     Ye += lParam.pt.y - Ym;
-                    Xe = Program.pairedHosts.RightBound > Xe ? Xe : Program.pairedHosts.RightBound;
-                    Xe = Program.pairedHosts.LeftBound < Xe ? Xe : Program.pairedHosts.LeftBound;
                     if (Ye < 0) Ye = 0;
 
-                    Program.PostLog("Xe="+Xe + "  Ye=" + Ye + " " + "Xm=" + Xm + "  Ym=" + Ym);
+                    Program.PostLog("Xe=" + Xe + "  Ye=" + Ye + " " + "Xm=" + Xm + "  Ym=" + Ym);
 
                     SendMouseMessage(wParam, ref lParam, Xe, Ye);
                     return 1;
@@ -151,12 +159,14 @@ namespace ExternalMouse
                 {
                     isLocalScreen = true;
                 }
-                Xe = 0;
+                Xe = lParam.pt.x;
                 Ye = lParam.pt.y;// 0;
             }
             catch { };
             Xm = lParam.pt.x;
             Ym = lParam.pt.y;
+
+            
             return CallNextHookEx(mouse_hook, code, wParam,  ref lParam);
         }
 
@@ -175,6 +185,14 @@ namespace ExternalMouse
 
         static private void SendMouseMessage(uint wParam, ref MSLLHOOKSTRUCT lParam, int Xe, int Ye)
         {
+            Host host = Program.pairedHosts.CheckHost(Xe, Ye);
+            if (host == null) return;
+            int XeReal;
+            if (Xe < 0)
+                XeReal = host.Width + Xe - host.RightBound ;
+            else XeReal = Xe - host.LeftBound;
+            Program.PostLog("XeReal=" + XeReal + "  Ye=" + Ye );
+
             UInt32 dwFlags=0;
             Int32 mouseData = (Int32)lParam.mouseData;
             dwFlags = MouseEventFlag[wParam - 0x200];
@@ -185,12 +203,12 @@ namespace ExternalMouse
             using (BinaryWriter bw = new BinaryWriter(ms))
             {
                 bw.Write((UInt32)InputType.MOUSE);
-                bw.Write((Int32)Xe);
+                bw.Write((Int32)XeReal);
                 bw.Write((Int32)Ye);
                 bw.Write(mouseData);
                 bw.Write(dwFlags);
                 bw.Write(lParam.time);
-                Program.pairedHosts.CheckAndSendIfExternalDesktop(ms.ToArray(), Xe, Ye);
+                host.Send(ms.ToArray());
             }
         }
 
@@ -229,6 +247,7 @@ namespace ExternalMouse
                         input.Data.Mouse.Time = (uint)Environment.TickCount;
                         if (input.Data.Mouse.Flags == MOUSEEVENTF_MOVE) SetCursorPos(input.Data.Mouse.X, input.Data.Mouse.Y);
                         else SendInput(1, ref input, Marshal.SizeOf(input));
+                        Program.PostLog("pt=" + input.Data.Mouse.X + ", " + input.Data.Mouse.Y);
                     }
                     else if (input.Type == (uint)InputType.KEYBOARD)
                     {
